@@ -1,7 +1,124 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>首席資優｜Google 登入</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>body{font:16px system-ui,sans-serif;max-width:440px;margin:55px auto;padding:20px;color:#17375b}button{background:#185c9b;color:white;border:0;border-radius:8px;padding:13px 20px;cursor:pointer}#status{margin-top:18px;color:#555}</style></head><body><h2>首席資優｜Google 登入</h2><p>請選擇已經獲得授權的 Google 帳號。</p><button id="btn" disabled>使用 Google 帳號登入</button><p id="status">載入中…</p><script>
-const qs=new URLSearchParams(location.search),clientId=qs.get('client_id'),nonce=qs.get('nonce');
-const status=document.getElementById('status');let oauth;
-function finish(payload){if(window.opener){window.opener.postMessage({type:'SHOUXI_LOGIN',nonce,...payload},'*');status.textContent=payload.error?'登入失敗：'+payload.error:'登入完成，請返回教務系統。';if(!payload.error)setTimeout(()=>window.close(),700)}else status.textContent='找不到原本的教務系統視窗，請關閉此頁重新操作。';}
-function init(){if(!clientId||!nonce||!window.opener){status.textContent='請從教務系統的登入按鈕開啟此頁。';return;}if(!window.google?.accounts?.oauth2){status.textContent='Google 登入服務尚未載入，請重新整理。';return;}oauth=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:'openid email profile',callback:r=>{if(r.error)finish({error:r.error});else if(r.access_token)finish({access_token:r.access_token});else finish({error:'Google 未回傳存取權杖'});}});document.getElementById('btn').disabled=false;status.textContent='登入設定已就緒。';}
-window.addEventListener('load',init);document.getElementById('btn').addEventListener('click',()=>{if(oauth)oauth.requestAccessToken({prompt:'select_account'});});
-</script></body></html>
+
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>首席資優｜Google 登入</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font: 16px system-ui, sans-serif;
+      max-width: 440px;
+      margin: 55px auto;
+      padding: 20px;
+      color: #17375b;
+    }
+    button {
+      background: #185c9b;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 13px 20px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    #status { margin-top: 18px; color: #555; }
+  </style>
+</head>
+<body>
+  <h2>首席資優｜Google 登入</h2>
+  <p>請選擇已獲授權的 Google 帳號。</p>
+  <button id="btn" disabled>使用 Google 帳號登入</button>
+  <p id="status">載入中…</p>
+
+  <script>
+    const qs = new URLSearchParams(location.search);
+    const clientId = qs.get('client_id');
+    const nonce = qs.get('nonce');
+    const openerOrigin = qs.get('opener_origin');
+
+    const status = document.getElementById('status');
+    const btn = document.getElementById('btn');
+    let oauth;
+
+    function allowedOrigin(value) {
+      try {
+        const u = new URL(value);
+        const host = u.hostname;
+        return u.protocol === 'https:' &&
+          u.origin === value &&
+          (
+            host === 'script.google.com' ||
+            host === 'script.googleusercontent.com' ||
+            host.endsWith('.script.googleusercontent.com')
+          );
+      } catch {
+        return false;
+      }
+    }
+
+    function finish(payload) {
+      if (!window.opener || !allowedOrigin(openerOrigin)) {
+        status.textContent = '無法確認原始教務系統視窗。';
+        return;
+      }
+
+      window.opener.postMessage(
+        { type: 'SHOUXI_LOGIN', nonce, ...payload },
+        openerOrigin
+      );
+
+      status.textContent = payload.error
+        ? '登入失敗：' + payload.error
+        : '登入完成，請返回教務系統。';
+
+      if (!payload.error) {
+        setTimeout(() => window.close(), 700);
+      }
+    }
+
+    function init() {
+      if (!clientId || !nonce || !window.opener ||
+          !allowedOrigin(openerOrigin)) {
+        status.textContent =
+          '請從教務系統的登入按鈕開啟此頁。';
+        return;
+      }
+
+      if (!window.google?.accounts?.oauth2) {
+        status.textContent =
+          'Google 登入服務未載入，請重新整理。';
+        return;
+      }
+
+      oauth = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'openid email profile',
+        callback: response => {
+          if (response.error) {
+            finish({ error: response.error });
+          } else if (response.access_token) {
+            finish({ access_token: response.access_token });
+          } else {
+            finish({ error: 'Google 未回傳存取權杖' });
+          }
+        }
+      });
+
+      btn.disabled = false;
+      status.textContent = '登入設定已就緒。';
+    }
+
+    window.addEventListener('load', init);
+
+    btn.addEventListener('click', () => {
+      if (oauth) {
+        oauth.requestAccessToken({
+          prompt: 'select_account'
+        });
+      }
+    });
+  </script>
+</body>
+</html>
