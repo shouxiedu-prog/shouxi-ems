@@ -1,37 +1,44 @@
-
 <!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="首席資優教務管理系統 Google 帳號登入">
   <title>首席資優｜Google 登入</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
-    body {
-      font: 16px system-ui, sans-serif;
-      max-width: 440px;
-      margin: 55px auto;
-      padding: 20px;
-      color: #17375b;
-    }
-    button {
-      background: #185c9b;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-      padding: 13px 20px;
-      cursor: pointer;
-    }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    #status { margin-top: 18px; color: #555; }
+    :root {color-scheme:light;--navy:#183153;--blue:#185c9b;--ink:#243750;--muted:#60728a;--line:#e2e9f2}
+    * {box-sizing:border-box}
+    body {margin:0;background:#f4f7fb;color:var(--ink);font:16px/1.7 system-ui,-apple-system,"Microsoft JhengHei",sans-serif}
+    header {background:var(--navy);color:#fff;padding:20px 18px}
+    header .inner, main, footer .inner {max-width:880px;margin:auto}
+    header strong {font-size:20px}
+    nav {display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+    nav a {color:#dce9ff;text-decoration:none;font-size:14px}
+    main {padding:52px 18px 60px;display:flex;justify-content:center}
+    .card {width:100%;max-width:480px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px;box-shadow:0 5px 24px #1831530a}
+    h1 {font-size:25px;line-height:1.4;margin:0 0 12px;color:var(--navy)}
+    p {margin:10px 0}
+    button {width:100%;background:var(--blue);color:#fff;border:0;border-radius:9px;padding:13px 20px;font:inherit;font-weight:600;cursor:pointer;margin-top:16px}
+    button:hover:not(:disabled) {background:#134a7d}
+    button:disabled {opacity:.5;cursor:not-allowed}
+    #status {margin-top:18px;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+    .small {font-size:13px;color:var(--muted)}
+    a {color:#1a56a3}
+    footer {border-top:1px solid var(--line);padding:22px 18px;color:var(--muted);font-size:13px}
+    @media(max-width:600px){main{padding:26px 12px 42px}.card{padding:24px 18px}header strong{font-size:18px}}
   </style>
 </head>
 <body>
-  <h2>首席資優｜Google 登入</h2>
-  <p>請選擇已獲授權的 Google 帳號。</p>
-  <button id="btn" disabled>使用 Google 帳號登入</button>
-  <p id="status">載入中…</p>
-
+  <header><div class="inner"><strong>首席資優｜教務管理系統</strong><nav aria-label="主要導覽"><a href="./">系統介紹</a><a href="privacy.html">隱私權政策</a><a href="terms.html">服務條款</a></nav></div></header>
+  <main><section class="card" aria-labelledby="login-title">
+    <h1 id="login-title">首席資優｜Google 登入</h1>
+    <p>請選擇已獲授權的 Google 帳號。</p>
+    <button id="btn" disabled>使用 Google 帳號登入</button>
+    <p id="status" role="status" aria-live="polite">載入中…</p>
+    <p class="small">本系統僅供經授權之教務人員使用。登入代表你已閱讀<a href="privacy.html">隱私權政策</a>及<a href="terms.html">服務條款</a>。</p>
+  </section></main>
+  <footer><div class="inner">營運單位：臺中市私立星科國語文短期補習班<br>聯絡信箱：<a href="mailto:shouxi.edu@gmail.com">shouxi.edu@gmail.com</a></div></footer>
   <script>
     const qs = new URLSearchParams(location.search);
     const clientId = qs.get('client_id');
